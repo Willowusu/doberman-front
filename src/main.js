@@ -4,7 +4,7 @@ import router from './router'
 import axios from 'axios';
 import { createPinia } from 'pinia'
 
-axios.defaults.baseURL = 'http://localhost:3000/api/v1'; 
+axios.defaults.baseURL = 'https://doberman-back.onrender.com/api/v1'; 
 axios.defaults.withCredentials = true; // Essential for sessions/cookies
 
 const app = createApp(App)
