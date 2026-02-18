@@ -86,7 +86,7 @@
                         <div class="p-6 border-b border-gray-100 flex justify-between items-center">
                             <h3 class="font-bold text-gray-900 text-sm">Automated Decisions</h3>
                             <p class="text-[10px] text-gray-400 font-mono uppercase tracking-tighter">Last {{
-                                history.length }} Events</p>
+        history.length }} Events</p>
                         </div>
 
                         <div class="overflow-x-auto">
@@ -105,12 +105,12 @@
                                     <tr v-for="dec in history" :key="dec._id"
                                         class="hover:bg-indigo-50/30 transition-colors group">
                                         <td class="px-6 py-4 text-xs font-mono text-gray-500">{{
-                                            formatDateShort(dec.createdAt) }}</td>
+        formatDateShort(dec.createdAt) }}</td>
                                         <td class="px-6 py-4">
                                             <div class="text-[11px] font-bold text-gray-900">{{ dec.eventId?.actionType
                                                 }}</div>
                                             <div class="text-[10px] text-gray-400 uppercase">{{
-                                                dec.eventId?.payload?.transactionType || 'N/A' }}</div>
+        dec.eventId?.payload?.transactionType || 'N/A' }}</div>
                                         </td>
                                         <td class="px-6 py-4 text-sm font-black text-center"
                                             :class="scoreColor(dec.score)">{{ dec.score }}</td>
@@ -124,7 +124,7 @@
                                             :class="getAmountColor(dec.eventId?.payload?.transactionType)">
                                             {{ getDirectionIcon(dec.eventId?.payload?.transactionType) }}
                                             GHS {{ formatNumber(dec.eventId?.payload?.amount ||
-                                            dec.eventId?.payload?.send_amount || 0) }}
+        dec.eventId?.payload?.send_amount || 0) }}
                                         </td>
                                         <td class="px-6 py-4 text-right">
                                             <button @click="openDrawer(dec)"
@@ -150,18 +150,18 @@
                             <div class="p-6 border-b border-gray-100 bg-gray-50/50 flex justify-between items-center">
                                 <h3 class="font-bold text-gray-900 text-sm">Business Registration & Tax</h3>
                                 <span class="text-[10px] font-mono text-gray-400 uppercase">TIN:
-                                    {{customer.complianceData?.bus_tin || 'N/A' }}</span>
+                                    {{ customer.complianceData?.busTin || 'N/A' }}</span>
                             </div>
                             <div class="p-6 grid grid-cols-1 md:grid-cols-3 gap-8">
-                                <InfoRow label="Business Type" :value="customer.complianceData?.bus_type"
+                                <InfoRow label="Business Type" :value="customer.complianceData?.busType"
                                     icon="briefcase" />
-                                <InfoRow label="Reg Number" :value="customer.complianceData?.bus_reg_number"
+                                <InfoRow label="Reg Number" :value="customer.complianceData?.busRegNumber"
                                     icon="document-text" />
                                 <InfoRow label="RGD Status" :value="customer.riskProfile?.rgdStatus"
                                     icon="shield-check" />
                                 <InfoRow label="Address" :value="customer.complianceData?.address"
                                     icon="location-marker" class="md:col-span-2" />
-                                <InfoRow label="Staff Size" :value="customer.complianceData?.staff_size" icon="users" />
+                                <InfoRow label="Staff Size" :value="customer.complianceData?.staffSize" icon="users" />
                             </div>
                         </div>
 
@@ -181,12 +181,12 @@
                                     <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
                                         <InfoRow label="Full Name" :value="director.name" />
                                         <InfoRow label="Date of Birth" :value="formatDate(director.dob)" />
-                                        <InfoRow label="ID Type" :value="director.id_type" />
-                                        <InfoRow label="ID Number" :value="director.id_number"
+                                        <InfoRow label="ID Type" :value="director.idType" />
+                                        <InfoRow label="ID Number" :value="director.idNumber"
                                             class="font-mono text-indigo-600" />
-                                        <InfoRow label="Issue Date" :value="formatDate(director.card_issue_date)" />
-                                        <InfoRow label="Expiry Date" :value="formatDate(director.card_expiry_date)"
-                                            :class="isExpired(director.card_expiry_date) ? 'text-rose-600 font-bold' : ''" />
+                                        <InfoRow label="Issue Date" :value="formatDate(director.cardIssueDate)" />
+                                        <InfoRow label="Expiry Date" :value="formatDate(director.cardExpiryDate)"
+                                            :class="isExpired(director.cardExpiryDate) ? 'text-rose-600 font-bold' : ''" />
 
                                         <div v-if="director.photoIDurl" class="md:col-span-2">
                                             <p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Identity
