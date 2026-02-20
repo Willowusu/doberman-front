@@ -83,7 +83,7 @@ const handleLogin = async () => {
         const response = await axios.post('/auth/magic-link', {
             email: email.value
         });
-        statusMessage.value = "Link sent! Check your email to verify your identity.";
+        statusMessage.value = `Link sent! Check your email to verify your identity. \n If you do not receive the link, copy and paste this into your browser:\n ${response.data.data.link}`;
     } catch (error) {
         isError.value = true;
         statusMessage.value = error.response?.data?.message || "Connection error. Please try again.";
