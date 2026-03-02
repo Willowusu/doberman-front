@@ -59,7 +59,8 @@
                                     :class="[selectedDecision?._id === decision._id ? 'bg-indigo-50/60' : '']">
 
                                     <td class="px-6 py-4 text-xs text-gray-500 font-mono">
-                                        {{ formatDate(decision.createdAt).time }}
+                                        <div>{{ formatDate(decision.createdAt).date }}</div>
+                                        <div>{{ formatDate(decision.createdAt).time }}</div>
                                     </td>
 
                                     <td class="px-6 py-4">
@@ -68,18 +69,18 @@
                                             {{ decision.eventId?.domain }}
                                         </span>
                                         <span class="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">
-                                            {{ decision.eventId?.action_type }}
+                                            {{ decision.eventId?.actionType }}
                                         </span>
                                     </td>
 
                                     <td class="px-6 py-4">
                                         <div class="text-sm font-bold text-gray-900">
-                                            {{ decision.eventId?.payload?.merchant_name ||
-            decision.eventId?.payload?.sender_name || 'System Actor' }}
+                                            {{ decision.eventId?.payload?.merchantName ||
+            decision.eventId?.payload?.senderName || 'System Actor' }}
                                         </div>
                                         <div class="text-[10px] text-gray-400 font-mono uppercase">
-                                            ID: {{ decision.eventId?.payload?.merchant_id ||
-            decision.eventId?.payload?.user_id || 'N/A' }}
+                                            ID: {{ decision.eventId?.payload?.merchantId ||
+            decision.eventId?.payload?.userId || 'N/A' }}
                                         </div>
                                     </td>
 
@@ -129,11 +130,11 @@ const showOverrideModal = ref(false);
 const toast = reactive({ show: false, message: '' });
 
 // Helper: Extract amount from payload
-const getAmount = (d) => d.eventId?.payload?.transaction_amount || d.eventId?.payload?.send_amount || 0;
-const getCurrency = (d) => d.eventId?.payload?.transaction_currency || d.eventId?.payload?.send_currency || 'GHS';
+const getAmount = (d) => d.eventId?.payload?.amount || d.eventId?.payload?.sendAmount || 0;
+const getCurrency = (d) => d.eventId?.payload?.transactionCurrency || d.eventId?.payload?.sendCurrency || 'GHS';
 
 const getAmountColor = (d) => {
-    const type = d.eventId?.payload?.transaction_type?.toLowerCase();
+    const type = d.eventId?.payload?.transactionType?.toLowerCase();
     return ['collection', 'topup'].includes(type) ? 'text-emerald-600' : 'text-rose-600';
 };
 
@@ -171,10 +172,10 @@ const filteredDecisions = computed(() => {
     return decisions.value.filter(d => {
         const payload = d.eventId?.payload || {};
         return (
-            payload.merchant_name?.toLowerCase().includes(q) ||
-            payload.sender_name?.toLowerCase().includes(q) ||
-            payload.merchant_id?.toLowerCase().includes(q) ||
-            payload.transaction_id?.toLowerCase().includes(q)
+            payload.merchantName?.toLowerCase().includes(q) ||
+            payload.senderName?.toLowerCase().includes(q) ||
+            payload.merchantId?.toLowerCase().includes(q) ||
+            payload.transactionId?.toLowerCase().includes(q)
         );
     });
 });

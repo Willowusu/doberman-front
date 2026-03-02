@@ -150,7 +150,7 @@ const initDashboard = async () => {
 
         stats.value = statsRes.data.data;
         recentAlerts.value = alertRes.data.data;
-        customers.value = custRes.data.data;
+        customers.value = custRes.data.data.docs;
     } catch (err) {
         console.error("Dashboard Load Error:", err);
     }
