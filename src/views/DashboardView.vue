@@ -23,39 +23,49 @@
 
                 <div class="lg:col-span-2 bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden">
                     <div class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50/50">
-                        <h3 class="font-bold text-gray-900 text-sm">Critical Flagged Events</h3>
-                        <router-link to="/alerts"
+                        <h3 class="font-bold text-gray-900 text-sm">Last 5 Events</h3>
+                        <router-link to="/events"
                             class="text-[10px] font-bold text-indigo-600 uppercase hover:underline">
-                            View All Alerts
+                            View All Events
                         </router-link>
                     </div>
 
                     <div class="divide-y divide-gray-50 max-h-[400px] overflow-y-auto">
-                        <div v-for="alert in recentAlerts" :key="alert._id"
-                            class="p-5 hover:bg-gray-50 transition-all flex items-center justify-between group">
+                        <div v-for="event in recentEvents" :key="event._id" @click="selectedDecision = event"
+                            class="p-5 hover:bg-indigo-50/30 cursor-pointer transition-all flex items-center justify-between group">
+
                             <div class="flex items-center space-x-4">
-                                <div :class="alert.severity === 'CRITICAL' ? 'bg-rose-100 text-rose-600' : 'bg-amber-100 text-amber-600'"
+                                <div :class="statusBg(event.status)"
                                     class="p-3 rounded-xl transition-transform group-hover:scale-110">
-                                    <component
-                                        :is="alert.severity === 'CRITICAL' ? ShieldExclamationIcon : ExclamationTriangleIcon"
-                                        class="h-5 w-5" />
+                                    <component :is="statusIcon(event.status)" class="h-5 w-5" />
                                 </div>
+
                                 <div>
-                                    <p class="text-sm font-bold text-gray-900">{{ alert.customerName || 'Unknown Entity'
-                                        }}</p>
-                                    <p class="text-[10px] text-gray-400 uppercase font-mono tracking-tighter">{{
-                    alert.reason }}</p>
+                                    <p class="text-sm font-bold text-gray-900">
+                                        {{ event.eventId?.payload?.senderName || event.eventId?.payload?.merchantName ||
+                    'System Actor' }}
+                                    </p>
+                                    <p class="text-[10px] text-gray-400 font-mono tracking-tighter uppercase">
+                                        <span class="text-indigo-500 font-bold">{{
+                    event.eventId?.payload?.transactionType || 'TX' }}</span>
+                                        • {{ event.eventId?.payload?.transactionId || 'No ID' }}
+                                    </p>
                                 </div>
                             </div>
+
                             <div class="text-right">
-                                <p class="text-xs font-bold text-gray-900">GHS {{ formatNumber(alert.amount || 0) }}</p>
-                                <p class="text-[10px] text-gray-400 font-medium">{{ formatDateShort(alert.createdAt) }}
+                                <p class="text-xs font-black text-gray-900">
+                                    {{ event.eventId?.payload?.receivingCurrency || 'GHS' }} {{
+                    formatNumber(event.eventId?.payload?.amount || 0) }}
+                                </p>
+                                <p class="text-[10px] font-bold" :class="scoreColor(event.score)">
+                                    Score: {{ event.score }}
                                 </p>
                             </div>
                         </div>
 
-                        <div v-if="recentAlerts.length === 0" class="p-10 text-center text-gray-400 text-xs italic">
-                            No critical alerts recorded in the last 24 hours.
+                        <div v-if="recentEvents.length === 0" class="p-10 text-center text-gray-400 text-xs italic">
+                            No events recorded
                         </div>
                     </div>
                 </div>
@@ -85,7 +95,7 @@
                                 <td class="px-6 py-4 text-center">
                                     <span
                                         class="px-3 py-1 bg-gray-100 rounded-lg text-gray-600 font-mono text-[10px] border border-gray-200">
-                                        {{ cust.riskProfileScore || 0 }}
+                                        {{ cust.onboardingRiskScore || 0 }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 text-center">
@@ -130,6 +140,31 @@ import {
     ExclamationTriangleIcon
 } from '@heroicons/vue/24/outline';
 
+// 1. Dynamic Backgrounds
+const statusBg = (status) => {
+    const map = {
+        'APPROVE': 'bg-emerald-100 text-emerald-600',
+        'DECLINE': 'bg-rose-100 text-rose-600',
+        'REVIEW': 'bg-amber-100 text-amber-600'
+    };
+    return map[status] || 'bg-slate-100 text-slate-600';
+};
+
+// 2. Dynamic Icons
+const statusIcon = (status) => {
+    if (status === 'APPROVE') return ShieldCheckIcon;
+    if (status === 'DECLINE') return ShieldExclamationIcon;
+    if (status === 'REVIEW') return ClockIcon;
+    return ShieldCheckIcon;
+};
+
+// 3. Score Text Color
+const scoreColor = (score) => {
+    if (score >= 100) return 'text-rose-600';
+    if (score >= 50) return 'text-amber-600';
+    return 'text-emerald-600';
+};
+
 const stats = ref({
     totalVolume: 0,
     highRiskCount: 0,
@@ -137,19 +172,19 @@ const stats = ref({
     decisionRate: 0,
     riskDistribution: []
 });
-const recentAlerts = ref([]);
+const recentEvents = ref([]);
 const customers = ref([]);
 
 const initDashboard = async () => {
     try {
-        const [statsRes, alertRes, custRes] = await Promise.all([
+        const [statsRes, eventsRes, custRes] = await Promise.all([
             axios.get('/dashboard/stats'),
-            axios.get('/alerts/global-feed'),
+            axios.post('/get-events?limit=5'),
             axios.get('/customers?limit=5')
         ]);
 
         stats.value = statsRes.data.data;
-        recentAlerts.value = alertRes.data.data;
+        recentEvents.value = eventsRes.data.data;
         customers.value = custRes.data.data.docs;
     } catch (err) {
         console.error("Dashboard Load Error:", err);

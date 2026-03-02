@@ -11,15 +11,16 @@
         </div>
     </Transition>
 
-    <AppLayout pageTitle="Intelligence Stream">
+    <AppLayout :pageTitle="`${capitalize(type)} Ledger`">
         <div class="relative min-h-[calc(100vh-160px)]">
             <div :class="[selectedDecision ? 'mr-[450px]' : 'mr-0']" class="transition-all duration-300 ease-in-out">
                 <div class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+
                     <div
                         class="p-6 border-b border-gray-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-gray-50/30">
                         <div>
-                            <h3 class="font-bold text-gray-800 text-lg">Live Decision Stream</h3>
-                            <p class="text-xs text-gray-500">Real-time risk evaluation across all domains</p>
+                            <h3 class="font-bold text-gray-800 text-lg">{{ capitalize(type) }} Stream</h3>
+                            <p class="text-xs text-gray-500">Monitoring real-time {{ type }} evaluation</p>
                         </div>
                         <div class="relative">
                             <svg class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" fill="none"
@@ -27,7 +28,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                             </svg>
-                            <input v-model="searchQuery" type="text" placeholder="Search Merchant, User or ID..."
+                            <input v-model="searchQuery" type="text" :placeholder="`Search ${type}...`"
                                 class="pl-10 pr-4 py-2 bg-white border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-indigo-500 w-80 outline-none transition-all" />
                         </div>
                     </div>
@@ -68,28 +69,25 @@
                                             class="text-[10px] font-bold px-2 py-0.5 bg-slate-100 text-slate-600 rounded mr-2 uppercase">
                                             {{ decision.eventId?.domain }}
                                         </span>
-                                        <span class="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">
-                                            {{ decision.eventId?.actionType }}
-                                        </span>
-                                        <div class="text-[10px] text-gray-400 font-bold uppercase tracking-tighter">
-                                            {{ decision.eventId?.payload.transactionType }}
+                                        <div
+                                            class="text-[10px] text-gray-400 font-bold uppercase tracking-tighter mt-1">
+                                            ID: {{ decision.eventId?.payload?.transactionId || 'N/A' }}
                                         </div>
                                     </td>
 
                                     <td class="px-6 py-4">
                                         <div class="text-sm font-bold text-gray-900">
-                                            {{ decision.eventId?.payload?.merchantName ||
-            decision.eventId?.payload?.senderName || 'System Actor' }}
+                                            {{ decision.eventId?.payload?.senderName ||
+            decision.eventId?.payload?.merchantName || 'System Actor' }}
                                         </div>
                                         <div class="text-[10px] text-gray-400 font-mono uppercase">
-                                            ID: {{ decision.eventId?.payload?.merchantId ||
-            decision.eventId?.payload?.userId || 'N/A' }}
+                                            To: {{ decision.eventId?.payload?.recipientName || 'N/A' }}
                                         </div>
                                     </td>
 
                                     <td class="px-6 py-4 text-sm font-bold text-right"
                                         :class="getAmountColor(decision)">
-                                        {{ getCurrency(decision) }} {{ formatCurrency(getAmount(decision)) }}
+                                        GHS {{ formatCurrency(decision.eventId?.payload?.amount || 0) }}
                                     </td>
 
                                     <td class="px-6 py-4 text-center font-black" :class="scoreColor(decision.score)">
@@ -105,6 +103,10 @@
                                 </tr>
                             </tbody>
                         </table>
+
+                        <div v-if="filteredDecisions.length === 0" class="p-20 text-center text-gray-400 italic">
+                            No {{ type }} transactions found matching your criteria.
+                        </div>
                     </div>
                 </div>
             </div>
@@ -120,25 +122,35 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, reactive } from 'vue';
+import { ref, computed, onMounted, reactive, watch } from 'vue';
 import axios from 'axios';
 import AppLayout from '../layouts/AppLayout.vue';
 import EventDetailsDrawer from '../components/EventDetailsDrawer.vue';
 import OverrideModal from '../components/OverrideModal.vue';
 
+const props = defineProps(['type']);
 const decisions = ref([]);
 const selectedDecision = ref(null);
 const searchQuery = ref('');
 const showOverrideModal = ref(false);
 const toast = reactive({ show: false, message: '' });
 
-// Helper: Extract amount from payload
-const getAmount = (d) => d.eventId?.payload?.amount || d.eventId?.payload?.sendAmount || 0;
-const getCurrency = (d) => d.eventId?.payload?.transactionCurrency || d.eventId?.payload?.sendCurrency || 'GHS';
+// API Fetching
+const fetchTransactions = async () => {
+    try {
+        const res = await axios.get(`/transactions/${props.type}`);
+        decisions.value = res.data.data || [];
+    } catch (err) {
+        console.error(`Failed to fetch ${props.type}:`, err);
+    }
+};
+
+// UI Helpers (Direct copy from EventsView for consistency)
+const capitalize = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 
 const getAmountColor = (d) => {
-    const type = d.eventId?.payload?.transactionType?.toLowerCase();
-    return ['collection', 'topup'].includes(type) ? 'text-emerald-600' : 'text-rose-600';
+    const t = props.type?.toLowerCase();
+    return ['collections', 'topup'].includes(t) ? 'text-emerald-600' : 'text-rose-600';
 };
 
 const showToast = (msg) => {
@@ -165,7 +177,7 @@ const formatDate = (isoString) => {
     const d = new Date(isoString);
     return {
         date: d.toLocaleDateString('en-GB'),
-        time: d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+        time: d.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' })
     };
 };
 
@@ -175,9 +187,8 @@ const filteredDecisions = computed(() => {
     return decisions.value.filter(d => {
         const payload = d.eventId?.payload || {};
         return (
-            payload.merchantName?.toLowerCase().includes(q) ||
             payload.senderName?.toLowerCase().includes(q) ||
-            payload.merchantId?.toLowerCase().includes(q) ||
+            payload.recipientName?.toLowerCase().includes(q) ||
             payload.transactionId?.toLowerCase().includes(q)
         );
     });
@@ -190,13 +201,11 @@ const handleDecisionUpdated = (updatedDecision) => {
     showToast(`Decision overridden to ${updatedDecision.status}`);
 };
 
-onMounted(async () => {
-    try {
-        // Updated to your new backend route if necessary
-        const res = await axios.post('/get-events');
-        decisions.value = res.data.data || [];
-    } catch (err) {
-        console.error("Failed to stream decisions:", err);
-    }
+// Lifecycle: Watch for type changes (e.g. going from Collections to Remittance)
+watch(() => props.type, () => {
+    selectedDecision.value = null; // Close drawer on menu change
+    fetchTransactions();
 });
+
+onMounted(fetchTransactions);
 </script>

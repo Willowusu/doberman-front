@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import axios from 'axios';
 
+
 const routes = [
     {
         path: '/',
@@ -28,7 +29,14 @@ const routes = [
         component: () => import('../views/DashboardView.vue'),
         meta: { requiresAuth: true } // Mark this as protected
     },
-     {
+    {
+        path: '/transactions/:type',
+        name: 'transactions',
+        component: () => import('../views/TransactionListView.vue'),
+        props: true, // This allows the :type (e.g., 'collections') to be passed as a prop
+        meta: { requiresAuth: true }
+    },
+    {
         path: '/events',
         name: 'Events',
         component: () => import('../views/EventsView.vue'),
