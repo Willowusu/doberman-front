@@ -70,12 +70,14 @@ const routes = [
         path: '/customers',
         name: 'Customers',
         component: () => import('../views/CustomersView.vue'),
+        meta: { requiresAuth: true },
         props: true // Allows the ID to be passed as a prop if needed
     },
     {
         path: '/customers/:id',
         name: 'CustomerDetail',
         component: () => import('../views/CustomerDetailView.vue'),
+        meta: { requiresAuth: true },
         // This ensures the ID from the URL is passed to the component
         props: true
     },
@@ -83,36 +85,42 @@ const routes = [
         path: '/global-alerts',
         name: 'GlobalAlerts',
         component: () => import('../views/GlobalAlertsView.vue'),
+        meta: { requiresAuth: true },
         props: true
     },
     {
         path: '/settings',
         name: 'Settings',
         component: () => import('../views/SettingsView.vue'),
+        meta: { requiresAuth: true },
         props: true
     },
     {
         path: '/audit-logs',
         name: 'AuditLogs',
         component: () => import('../views/AuditLogsView.vue'),
+        meta: { requiresAuth: true },
         props: true
     },
     {
         path: '/sanction-screening',
         name: 'SanctionScreening',
         component: () => import('../views/SanctionScreeningView.vue'),
+        meta: { requiresAuth: true },
         props: true
     },
     {
         path: '/cases',
         name: 'Cases',
         component: () => import('../views/CasesView.vue'),
+        meta: { requiresAuth: true },
         props: true
     },
     {
         path: '/pep-screening',
         name: 'PEPScreening',
         component: () => import('../views/PepScreeningView.vue'),
+        meta: { requiresAuth: true },
         props: true
     },
     // 404 Catch-all: This must be the LAST item in the array

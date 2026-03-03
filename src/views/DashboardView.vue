@@ -138,8 +138,7 @@ import RiskDistributionChart from '../components/RiskDistributionChart.vue';
 import {
     ShieldExclamationIcon,
     ExclamationTriangleIcon,
-    ShieldCheckIcon,
-    ClockIcon
+    ShieldCheckIcon
 } from '@heroicons/vue/24/outline';
 
 // 1. Dynamic Backgrounds
@@ -177,11 +176,19 @@ const stats = ref({
 const recentEvents = ref([]);
 const customers = ref([]);
 
+const params = {
+    page: 1,
+    limit: 5,
+    search: '',
+    status: 'ALL',
+    startDate: null,
+    endDate: null
+};
 const initDashboard = async () => {
     try {
         const [statsRes, eventsRes, custRes] = await Promise.all([
             axios.get('/dashboard/stats'),
-            axios.post('/get-events?limit=5'),
+            axios.post('/get-events', { params }),
             axios.get('/customers?limit=5')
         ]);
 

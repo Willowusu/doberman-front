@@ -12,6 +12,8 @@
 
 <script setup>
 import { computed } from 'vue';
+import apexchart from "vue3-apexcharts";
+
 
 const props = defineProps({
     history: Array
