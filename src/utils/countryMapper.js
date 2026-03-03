@@ -193,8 +193,25 @@ const countryMap = {
 };
 
 
-export const getCountryName = (code) => {
-    if (!code) return "Unknown";
+export const getCountryName = (input) => {
+    console.log("Country Input:", input);
+
+    if (!input) return "Unknown";
+
+    let code = "";
+
+    // If input is a string (e.g., "us")
+    if (typeof input === 'string') {
+        code = input;
+    }
+    // If input is an object (e.g., { NATIONALITY: 'us' })
+    else if (typeof input === 'object') {
+        // Extract the value from common PEP keys
+        code = input.NATIONALITY || input.CITIZENSHIP || input.COUNTRY || "";
+    }
+
+    if (!code || typeof code !== 'string') return "Unknown";
+
     const upperCode = code.toUpperCase();
-    return countryMap[upperCode] || upperCode; // Returns the code if name not found
+    return countryMap[upperCode] || upperCode;
 };

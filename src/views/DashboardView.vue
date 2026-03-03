@@ -137,7 +137,9 @@ import RiskDistributionChart from '../components/RiskDistributionChart.vue';
 // Heroicons for the Alert Feed
 import {
     ShieldExclamationIcon,
-    ExclamationTriangleIcon
+    ExclamationTriangleIcon,
+    ShieldCheckIcon,
+    ClockIcon
 } from '@heroicons/vue/24/outline';
 
 // 1. Dynamic Backgrounds
@@ -184,7 +186,7 @@ const initDashboard = async () => {
         ]);
 
         stats.value = statsRes.data.data;
-        recentEvents.value = eventsRes.data.data;
+        recentEvents.value = eventsRes.data.data.docs;
         customers.value = custRes.data.data.docs;
     } catch (err) {
         console.error("Dashboard Load Error:", err);

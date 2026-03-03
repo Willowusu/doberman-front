@@ -1,30 +1,35 @@
 <template>
     <AppLayout pageTitle="PEP Screening">
         <div class="p-6 max-w-7xl mx-auto">
-            <div class="mb-8">
-                <h1 class="text-2xl font-bold text-gray-900">PEP Screening</h1>
-                <p class="text-gray-500">Search against the Senzing Politically Exposed Persons (PEP) registry.</p>
-            </div>
-
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6">
-                <div class="flex gap-4">
-                    <div class="relative flex-1">
-                        <span class="absolute inset-y-0 left-0 pl-3 flex items-center text-gray-400">
-                            <SearchIcon class="h-5 w-5" />
-                        </span>
-                        <input v-model="searchQuery" @keyup.enter="handleSearch" type="text"
-                            placeholder="Enter full name (e.g. Mahama)"
-                            class="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:ring-blue-500 focus:border-blue-500" />
-                    </div>
-                    <button @click="handleSearch" :disabled="loading || searchQuery.length < 3"
-                        class="px-6 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 disabled:opacity-50 transition-colors">
-                        <span v-if="loading">Searching...</span>
-                        <span v-else>Search PEP List</span>
-                    </button>
+            <section class="bg-slate-900 rounded-[40px] p-10 text-white shadow-2xl relative overflow-hidden">
+                <div class="mb-8">
+                    <h3 class="text-2xl font-black uppercase tracking-tight">PEP Screening</h3>
+                    <p class="text-slate-400 text-xs">Search against the Senzing Politically Exposed Persons (PEP)
+                        registry.
+                    </p>
                 </div>
-            </div>
 
-            <div v-if="results.length > 0" class="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div class="p-6 rounded-xl mb-6">
+                    <div class="flex gap-4">
+                        <div class="relative flex-1">
+                            <span class="absolute inset-y-0 left-0 pr-3 flex items-center text-gray-400">
+                                <SearchIcon class="h-5 w-5" />
+                            </span>
+                            <input v-model="searchQuery" @keyup.enter="handleSearch" type="text"
+                                placeholder="Enter full name (e.g. Mahama)"
+                                class="w-full bg-slate-800 border-none rounded-2xl px-6 py-4 text-sm font-bold placeholder:text-slate-500 focus:ring-2 focus:ring-indigo-500 transition-all outline-none" />
+                        </div>
+                        <button @click="handleSearch" :disabled="loading || searchQuery.length < 3"
+                            class="bg-indigo-600 hover:bg-indigo-500 px-8 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all">
+                            <span v-if="loading">Searching...</span>
+                            <span v-else>Search PEP List</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <div v-if="results.length > 0"
+                class="bg-white mt-5 rounded-xl shadow-sm border border-gray-100 overflow-hidden">
                 <table class="min-w-full divide-y divide-gray-200">
                     <thead class="bg-gray-50">
                         <tr>
@@ -56,7 +61,7 @@
                             <td class="px-6 py-4">
                                 <div class="flex items-center gap-2">
                                     <span class="text-gray-400 text-xs font-mono bg-gray-100 px-1 rounded">{{
-                                        pep.country }}</span>
+                                pep.country }}</span>
                                     <span class="text-sm text-gray-600">{{ getCountryName(pep.country) }}</span>
                                 </div>
                             </td>
@@ -168,6 +173,7 @@ const handleSearch = async () => {
         const response = await axios.get(`/pep/search`, {
             params: { name: searchQuery.value }
         });
+        console.log(response.data.data.results)
         results.value = response.data.data.results;
     } catch (error) {
         console.error("PEP Search failed", error);

@@ -2,50 +2,70 @@
     <AppLayout pageTitle="Customers">
         <div class="space-y-6">
             <div
-                class="bg-white p-6 rounded-3xl border border-gray-200 shadow-sm flex flex-col md:flex-row justify-between items-end gap-6">
-                <div class="flex flex-wrap items-center gap-4">
-                    <div class="relative w-full md:w-64">
-                        <label class="text-[10px] font-bold text-gray-400 uppercase ml-1 block mb-1">Search
-                            Entity</label>
-                        <input v-model="filters.search" @input="debounceSearch" type="text"
-                            placeholder="Name, email or TIN..."
-                            class="pl-10 pr-4 py-2 w-full bg-gray-50 border border-gray-200 rounded-xl text-xs outline-none focus:ring-2 focus:ring-indigo-500 shadow-sm" />
-                        <span class="absolute left-3 top-8 text-gray-400">
-                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                        </span>
-                    </div>
-                    <div class="flex flex-col">
-                        <label class="text-[10px] font-bold text-gray-400 uppercase ml-1 block mb-1">Risk Tier</label>
-                        <select v-model="filters.riskLevel" @change="handleFilterChange"
-                            class="text-xs border-gray-200 rounded-xl bg-gray-50 focus:ring-indigo-500 min-w-[120px]">
-                            <option value="ALL">All Levels</option>
-                            <option value="LOW">Low Risk</option>
-                            <option value="MEDIUM">Medium</option>
-                            <option value="MEDIUM-HIGH">Medium-High</option>
-                            <option value="HIGH">High Risk</option>
-                        </select>
+                class="bg-white p-8 rounded-[32px] border border-gray-200 shadow-sm flex flex-col lg:flex-row justify-between items-end gap-6 transition-all duration-300">
+
+                <div class="flex flex-wrap items-center gap-6 w-full lg:w-auto">
+
+                    <div class="relative w-full md:w-72 group">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 block mb-2">
+                            Search Entity
+                        </label>
+                        <div class="relative">
+                            <MagnifyingGlassIcon
+                                class="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 group-focus-within:text-indigo-600 transition-colors" />
+                            <input v-model="filters.search" @input="debounceSearch" type="text"
+                                placeholder="Name, email or TIN..."
+                                class="pl-11 pr-4 py-3 w-full bg-slate-50/50 border border-slate-100 rounded-2xl text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white transition-all shadow-sm" />
+                        </div>
                     </div>
 
-                    <div class="flex items-center gap-2">
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-400 uppercase ml-1 block mb-1">From</label>
-                            <input type="date" v-model="filters.startDate" @change="handleFilterChange"
-                                class="text-xs border-gray-200 rounded-xl bg-gray-50 focus:ring-indigo-500" />
+                    <div class="flex flex-col w-full md:w-44 group">
+                        <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 block mb-2">
+                            Risk Tier
+                        </label>
+                        <div class="relative">
+                            <FunnelIcon
+                                class="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
+                            <select v-model="filters.riskLevel" @change="handleFilterChange"
+                                class="pl-11 pr-10 py-3 w-full appearance-none bg-slate-50/50 border border-slate-100 rounded-2xl text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white transition-all cursor-pointer shadow-sm">
+                                <option value="ALL">All Levels</option>
+                                <option value="LOW">Low Risk</option>
+                                <option value="MEDIUM">Medium</option>
+                                <option value="MEDIUM-HIGH">Medium-High</option>
+                                <option value="HIGH">High Risk</option>
+                            </select>
+                            <ChevronDownIcon
+                                class="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400 pointer-events-none" />
                         </div>
-                        <div>
-                            <label class="text-[10px] font-bold text-gray-400 uppercase ml-1 block mb-1">To</label>
+                    </div>
+
+                    <div class="flex items-center gap-3 w-full md:w-auto">
+                        <div class="flex-1">
+                            <label
+                                class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 block mb-2">From</label>
+                            <input type="date" v-model="filters.startDate" @change="handleFilterChange"
+                                class="px-4 py-3 w-full bg-slate-50/50 border border-slate-100 rounded-2xl text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white transition-all shadow-sm" />
+                        </div>
+                        <div class="mt-6 text-slate-300 font-bold">—</div>
+                        <div class="flex-1">
+                            <label
+                                class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 block mb-2">To</label>
                             <input type="date" v-model="filters.endDate" @change="handleFilterChange"
-                                class="text-xs border-gray-200 rounded-xl bg-gray-50 focus:ring-indigo-500" />
+                                class="px-4 py-3 w-full bg-slate-50/50 border border-slate-100 rounded-2xl text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 focus:bg-white transition-all shadow-sm" />
                         </div>
                     </div>
                 </div>
 
-                <button @click="resetFilters"
-                    class="text-xs font-bold text-indigo-600 hover:bg-indigo-50 px-4 py-2 rounded-xl transition-all">
-                    Reset Filters
-                </button>
+                <div class="flex items-center gap-3 w-full lg:w-auto">
+                    <button @click="resetFilters"
+                        class="flex-1 lg:flex-none text-[11px] font-black text-slate-400 uppercase tracking-widest hover:text-indigo-600 hover:bg-indigo-50 px-6 py-3 rounded-2xl transition-all border border-transparent hover:border-indigo-100">
+                        Reset
+                    </button>
+                    <button @click="handleFilterChange"
+                        class="flex-1 lg:flex-none bg-slate-900 text-white text-[11px] font-black uppercase tracking-widest px-8 py-3 rounded-2xl hover:bg-indigo-600 shadow-lg shadow-slate-200 transition-all active:scale-95">
+                        Apply Filters
+                    </button>
+                </div>
             </div>
 
             <div class="bg-white rounded-3xl border border-gray-200 shadow-sm overflow-hidden">
@@ -59,6 +79,7 @@
                                 <th class="px-6 py-4 text-center">Inherent Score</th>
                                 <th class="px-6 py-4 text-center">TX Count</th>
                                 <th class="px-6 py-4">Total Inbound</th>
+                                <th class="px-6 py-4">Total Outbound</th>
                                 <th class="px-6 py-4">Last Seen</th>
                                 <th class="px-6 py-4"></th>
                             </tr>
@@ -89,15 +110,17 @@
                                 <td class="px-6 py-4 text-center">
                                     <span
                                         class="text-xs font-mono font-bold bg-gray-100 px-2 py-1 rounded text-gray-600">
-                                        {{ customer.riskProfileScore || 0 }}
+                                        {{ customer.onboardingRiskScore || 0 }}
                                     </span>
                                 </td>
                                 <td class="px-6 py-4 text-center text-sm text-gray-600 font-mono">{{
-                                    customer.totalTransactions }}</td>
+                                customer.totalTransactions }}</td>
                                 <td class="px-6 py-4 text-sm font-bold text-emerald-600">{{
-                                    formatCurrency(customer.totalInboundVolume) }}</td>
+                                formatCurrency(customer.totalInboundVolume) }}</td>
+                                <td class="px-6 py-4 text-sm font-bold text-red-600">{{
+                                formatCurrency(customer.totalOutboundVolume) }}</td>
                                 <td class="px-6 py-4 text-[10px] text-gray-400 font-medium uppercase">{{
-                                    formatDate(customer.lastSeen || customer.createdAt) }}</td>
+                                formatDate(customer.lastSeen || customer.createdAt) }}</td>
                                 <td class="px-6 py-4 text-right">
                                     <button @click="router.push(`/customers/${customer._id}`)"
                                         class="p-2 text-indigo-400 hover:text-indigo-600 hover:bg-white rounded-xl transition-all">
@@ -137,6 +160,11 @@ import { ref, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import axios from 'axios';
 import AppLayout from '../layouts/AppLayout.vue';
+import {
+    MagnifyingGlassIcon,
+    FunnelIcon,
+    ChevronDownIcon
+} from '@heroicons/vue/24/outline';
 
 const router = useRouter();
 const customers = ref([]);
